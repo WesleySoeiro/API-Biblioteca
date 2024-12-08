@@ -6,98 +6,61 @@ import Duplicatas from "../erros/Duplicidade.js";
 class AutorController {
   static async listarAutores(req, res, next) {
     try {
-      const listaAutores = await autor.find({});
-      res.status(200).json(listaAutores);
+      const listaAutores = autor.find();
+      req.resultado = listaAutores;
+      next();
     } catch (erro) {
       next(erro);
     }
   }
 
   static cadastrarAutor = async (req, res, next) => {
-    const novoAutor = req.body;
+    try {
+      const novoAutor = req.body;
+      let autorCriado = await autor.create(novoAutor);
 
-    const objMinusculo = {};
+      res.status(201).json({
+        message: "Autor cadastrado com sucesso",
+        autor: autorCriado,
+      });
+    } catch (erro) {
+      console.log(erro);
 
-    Object.entries(novoAutor).forEach(([chave, valor]) => {
-      objMinusculo[chave.toLowerCase()] =
-        typeof valor === "string" ? valor.toLowerCase() : valor;
-    });
-
-    const duplicatas = new Duplicatas();
-    const confereExistencia = await duplicatas.confereExistencia(objMinusculo);
-    if (!confereExistencia) {
-      try {
-        let autorCriado = await autor.create(objMinusculo);
-
-        res.status(201).json({
-          message: "Autor cadastrado com sucesso",
-          autor: autorCriado,
-        });
-      } catch (erro) {
-        console.log(erro);
-
-        next(erro);
-      }
-    } else {
-      console.log("caiu aqui");
-      next(new NaoEncontrado("Já existe um registro no sistema", 409));
+      next(erro);
     }
   };
-  static get cadastrarAutor() {
-    return AutorController._cadastrarAutor;
-  }
-  static set cadastrarAutor(value) {
-    AutorController._cadastrarAutor = value;
-  }
 
-  static listarAutorPorID = async (req, res, next) => {
-    const id = req.params.id;
-
+  static filtrarAutores = async (req, res, next) => {
     try {
-      const id = req.params.id;
+      const rotaQuery = req.query;
+      const filtro = {};
 
-      if (mongoose.Types.ObjectId.isValid(id)) {
-        const autorEncontrado = await autor.findById(id);
-        if (autorEncontrado) {
-          res.status(200).json({ autorEncontrado });
-        } else {
-          next(new NaoEncontrado("autor nao encontrado"));
-        }
-      } else {
-        res.status(400).send({
-          mensagem: "Um ou mais dados inseridos estão Incorretos",
-          status: 400,
-        });
-      }
+      Object.entries(rotaQuery).forEach(([chave, valor]) => {
+        filtro[chave] = new RegExp(valor, "i");
+      });
+
+      const filtroAutor = autor.find(filtro);
+      req.resultado = filtroAutor;
+      next();
     } catch (erro) {
       next(erro);
     }
   };
 
   static atualizarAutor = async (req, res, next) => {
-    const obj = req.body;
-    const objMinusculo = {};
-
-    Object.entries(obj).forEach(([chave, valor]) => {
-      objMinusculo[chave.toLowerCase()] =
-        typeof valor === "string" ? valor.toLowerCase() : valor;
-    });
-
     try {
       const id = req.params.id;
-      if (mongoose.Types.ObjectId.isValid(id)) {
-        const autorEncontrado = await autor.findByIdAndUpdate(id, objMinusculo);
+      const dadosAtualizados = req.body;
 
-        if (autorEncontrado) {
-          res.status(200).json({ message: "Autor atualizado com sucesso" });
-        } else {
-          next(new NaoEncontrado("ID nao encontrado"));
-        }
+      const autorAtualizado = await autor.findByIdAndUpdate(
+        id,
+        dadosAtualizados
+      );
+
+      if (autorAtualizado) {
+        res.status(200).json({ message: "Autor atualizado com sucesso" });
       } else {
-        res.status(400).send({
-          mensagem: "Um ou mais dados inseridos estão Incorretos",
-          status: 400,
-        });
+        next(new NaoEncontrado("ID nao encontrado"));
       }
     } catch (erro) {
       next(erro);

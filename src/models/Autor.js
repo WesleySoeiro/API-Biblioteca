@@ -7,8 +7,9 @@ const autorSchema = new mongoose.Schema(
       type: String,
       required: [true, "O nome do autor é obrigatório"],
       unique: false,
+      lowercase: true,
     },
-    nacionalidade: { type: String },
+    nacionalidade: { type: String, lowercase: true },
   },
   { versionKey: false }
 );
