@@ -1,7 +1,6 @@
 import livro from "../models/Livros.js";
 import mongoose from "mongoose";
 import NaoEncontrado from "../erros/404.js";
-import Duplicatas from "../erros/Duplicidade.js";
 
 class LivroController {
   static listarLivros = async (req, res) => {
@@ -59,29 +58,18 @@ class LivroController {
   };
 
   static atualizarLivro = async (req, res, next) => {
-    const obj = req.body;
-    const objMinusculo = {};
-
-    Object.entries(obj).forEach(([chave, valor]) => {
-      objMinusculo[chave.toLowerCase()] =
-        typeof valor === "string" ? valor.toLowerCase() : valor;
-    });
-
     try {
       const id = req.params.id;
-      if (mongoose.Types.ObjectId.isValid(id)) {
-        const livroEncontrado = await livro.findByIdAndUpdate(id, objMinusculo);
+      const novosDados = req.body;
 
-        if (livroEncontrado) {
-          res.status(200).json({ message: "Livro atualizado com sucesso" });
-        } else {
-          next(new NaoEncontrado("Livro nao encontrado"));
-        }
+      console.log(novosDados);
+
+      const livroEncontrado = await livro.findByIdAndUpdate(id, novosDados);
+
+      if (livroEncontrado) {
+        res.status(200).json({ message: "Livro atualizado com sucesso" });
       } else {
-        res.status(400).send({
-          mensagem: "Um ou mais dados inseridos estão Incorretos",
-          status: 400,
-        });
+        next(new NaoEncontrado("Livro nao encontrado"));
       }
     } catch (erro) {
       next(erro);
@@ -101,7 +89,7 @@ class LivroController {
         }
       } else {
         res.status(400).send({
-          mensagem: "Um ou mais dados inseridos estão Incorretos",
+          mensagem: "Um ou mais dados inseridos estão Incorretos.",
           status: 400,
         });
       }

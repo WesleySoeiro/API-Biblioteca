@@ -6,6 +6,7 @@ const livroSchema = new mongoose.Schema(
     id: { type: mongoose.Schema.Types.ObjectId },
     titulo: {
       type: String,
+      lowercase: true,
       required: [true, "O título é obrigatório"],
       unique: false,
     },
@@ -18,6 +19,7 @@ const livroSchema = new mongoose.Schema(
     editora: {
       type: String,
       required: [true, "O nome da editora é obrigatório"],
+      lowercase: true,
     },
     preco: { type: Number, required: [true, "O preço é obrigatório"] },
     paginas: {
