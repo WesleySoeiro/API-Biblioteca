@@ -1,12 +1,13 @@
 import livro from "../models/Livros.js";
 import mongoose from "mongoose";
-import NaoEncontrado from "../erros/404.js";
+import ErroBase from "../erros/ErroBase.js";
 
 class LivroController {
-  static listarLivros = async (req, res) => {
+  static listarLivros = async (req, res, next) => {
     try {
-      const listaLivros = await livro.find().populate().exec();
-      res.status(200).json(listaLivros);
+      const buscaLivro = livro.find();
+      req.resultado = buscaLivro;
+      next();
     } catch (erro) {
       next(erro);
     }
@@ -19,7 +20,7 @@ class LivroController {
       let livroCriado = await livro.create(novoLivro);
 
       res.status(201).json({
-        message: "Livro cadastrado com sucesso",
+        message: "Livro cadastrado com sucesso.",
         livro: livroCriado,
       });
     } catch (erro) {
@@ -50,8 +51,9 @@ class LivroController {
         }
       });
 
-      const livroResultado = await livro.find(filtro);
-      res.status(200).json(livroResultado);
+      const livroResultado = livro.find(filtro);
+      req.resultado = livroResultado;
+      next();
     } catch (erro) {
       next(erro);
     }

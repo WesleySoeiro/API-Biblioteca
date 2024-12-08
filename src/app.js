@@ -3,6 +3,7 @@ import dbConnect from "./config/dbConnect.js";
 import routes from "./routes/index.js";
 import manipulador404 from "./middlewares/manipulador404.js";
 import manipuladorDeErros from "./middlewares/manipuladorDeErros.js";
+import paginar from "./middlewares/paginacao.js";
 
 const conexao = await dbConnect();
 
@@ -18,8 +19,6 @@ const app = express();
 
 app.use(express.json());
 routes(app);
-
-app.use(manipulador404);
-app.use(manipuladorDeErros);
+app.use(manipulador404, manipuladorDeErros, paginar);
 
 export default app;
