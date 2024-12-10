@@ -2,13 +2,19 @@ import express from "express";
 import AutorController from "../controllers/autorController.js";
 import paginar from "../middlewares/paginacao.js";
 
-const routes = express.Router();
+const router = express.Router();
 
-routes.get("/autor", AutorController.listarAutores, paginar);
-routes.get("/autor/busca", AutorController.filtrarAutores, paginar);
-routes.post("/autor/", AutorController.cadastrarAutor);
-routes.put("/autor/:id", AutorController.atualizarAutor);
-routes.patch("/autor/:id", AutorController.atualizarAutor);
-routes.delete("/autor/:id", AutorController.deletarAutor);
+router
+  .route("/autor")
+  .get(AutorController.listarAutores, paginar)
+  .post(AutorController.cadastrarAutor);
 
-export default routes;
+router.route("/autor/busca").get(AutorController.filtrarAutores, paginar);
+
+router
+  .route("/autor/:id")
+  .put(AutorController.atualizarAutor)
+  .patch(AutorController.atualizarAutor)
+  .delete(AutorController.deletarAutor);
+
+export default router;
