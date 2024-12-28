@@ -1,4 +1,4 @@
-import { autor } from "../models/Autor.js";
+import autor from "../models/Autor.js";
 import livro from "../models/Livros.js";
 import ErroBase from "./ErroBase.js";
 

@@ -1,4 +1,5 @@
 import NaoEncontrado from "../erros/404.js";
+import mongoose from "mongoose";
 
 async function paginar(req, res, next) {
   try {
@@ -23,6 +24,7 @@ async function paginar(req, res, next) {
     });
 
     const resultado = req.resultado;
+
     const resultadoPaginado = await resultado
       .find()
       .sort({ [campoOrdenacao]: ordem })
@@ -35,7 +37,11 @@ async function paginar(req, res, next) {
     } else {
       next(new NaoEncontrado("Não há mais dados para listar."));
     }
+    if (!resultadoPaginado) {
+      next(new NaoEncontrado("Os dados fornecidos não foram encontrados."));
+    }
   } catch (erro) {
+    console.log(erro);
     next(erro);
   }
 }
